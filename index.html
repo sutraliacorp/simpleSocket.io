@@ -22,7 +22,7 @@
 			<form id="userForm">
 				<div class="form-group">
 					<label>enter username</label>
-					<input class="form-control" id="username"></textarea>
+					<input class="form-control" id="username"></input>
 					<br>
 					<input type="submit" name="btn btn-primary" value="Login"/>
 				</div>
@@ -31,16 +31,25 @@
 	</div>
 	<div id="messageArea" class="row">
 		<div class="col-md-4">
+			<div class="well" id="me">
+				<input type="hidden" class="form-control" id="myid"></input>
+				<!-- <ul class="list-group" id="users"></ul> -->
+			</div>
 			<div class="well">
 				<h3>online users</h3>
 				<ul class="list-group" id="users"></ul>
 			</div>
 		</div>
 		<div class="col-md-8">
-			<div class="chat" id="chat"></div>
+			<div class="chat">
+			<ul id="chat">
+				
+			</ul>
+				
+			</div>
 			<form id="messageForm">
 				<div class="form-group">
-					<label>enter message</label>
+					<!-- <label>enter message</label> -->
 					<textarea class="form-control" id="message"></textarea>
 					<br>
 					<input type="submit" name="btn btn-primary" value="Send message"/>
@@ -60,6 +69,10 @@
 		var $username = $('#username');
 		var $userForm = $('#userForm');
 		var $users = $('#users');
+		var $me = $('#me');
+		var $myid = $('#myid');
+
+		// var aku = $me.val();
 
 
 		$messageForm.submit(function(e){
@@ -72,8 +85,19 @@
 
 
 		socket.on('new message', function(data){
-			console.log(data);
-			$chat.append('<div class="well"><strong>'+data.user+'</strong> '+data.msg+'</div>')
+			console.log($myid.val());
+			var identity = '';
+			var style ='';
+			if(data.user == $myid.val()){
+				identity = 'Me';
+				style = 'style="width: 60%;float: right;"';
+
+			}
+			else{
+				identity = data.user;
+				style = 'style="width: 60%;float: left;"';
+			}
+			$chat.append('<li class="well" ' +style+' ><strong>'+identity+'</strong> '+data.msg+'</li>')
 		});
 
 		$userForm.submit(function(e){
@@ -82,9 +106,14 @@
 				if(data){
 					$userFormArea.hide();
 					$messageArea.show();
+					
 				}
 			});
+			var htmlme = '<h3>'+$username.val()+'</h3>';
+			$me.html(htmlme);
+			$myid.val($username.val());
 			$username.val('');
+
 			// console.log('submited');
 		});
 
